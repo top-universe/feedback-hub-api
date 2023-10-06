@@ -1,7 +1,7 @@
 /**
  * Import successFunction and errorFunction and set up global variables
  */
-import { success, error } from "./response"; //Response Object {success, error}
+import { success, error } from "./response copy"; //Response Object {success, error}
 
 /**
  * @typedef {Object} - Response Object
