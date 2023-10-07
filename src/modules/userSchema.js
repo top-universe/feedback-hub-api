@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { environment } = require("../config/environment");
 const { JWT_SECRET } = environment;
+
 let schema = new mongoose.Schema(
   {
     _id: {
@@ -47,10 +48,21 @@ schema.pre("save", async function () {
     this.password !== null ? bcrypt.hash(this.password, salt) : null);
 });
 
+
 exports.generateHash = async (reqPassword) => {
-  const salt = await bcrypt.genSalt(10);
-  return await bcrypt.hash(reqPassword, salt);
+  console.log("hashedPassword");
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(reqPassword, salt);
+    console.log(hashedPassword);
+    return hashedPassword;
+  } catch (error) {
+    console.error('Error generating hash:', error);
+    throw error; // Rethrow the error to handle it elsewhere if needed
+  }
 };
+
+
 // comparing the password
 schema.methods.comparePassword = async function (reqPassword) {
   const correctPassword = await bcrypt.compare(reqPassword, this.password);
@@ -83,4 +95,7 @@ exports.authValidatorSchema = Joi.object().keys({
   password: Joi.string().min(5).required(),
 });
 
-exports.userCollection = mongoose.model("user", schema);
+
+const userCollection = mongoose.model("user", schema);
+
+module.exports = { userCollection };

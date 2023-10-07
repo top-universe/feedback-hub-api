@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { environment } = require("../config/environment");
 
-const { NODE_ENV, DATABASE_URI_DEVELOP, DATABASE_URI_PROD } =
+const { NODE_ENV, DATABASE, DATABASE_URI_PROD } =
   environment;
 mongoose.set("strictQuery", true);
 const db = (URi) => {
@@ -38,7 +38,7 @@ const db = (URi) => {
 
 if (NODE_ENV === "development") {
   console.log(`DB running in ${NODE_ENV} mode`);
-  module.exports = db(DATABASE_URI_DEVELOP);
+  module.exports = db(DATABASE);
 }
 if (NODE_ENV === "production") {
   console.log(`DB running in ${NODE_ENV} mode`);

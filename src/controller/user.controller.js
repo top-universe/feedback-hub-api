@@ -1,11 +1,9 @@
   const { register } = require("../helpers/repository/user.repository"),
-        { response } = require("../utils/response"),
+        { response, authResponse } = require("../utils/response"),
         { SIGNUP_TEMPLATE } = require("../utils/email.template"),
         emailService = require("../services/email.service"),
-        checkUser = require("../services/checkUser"),
         {
         userCollection,
-        generateHash,
         } = require("../modules/userSchema"),
         
         {
@@ -13,82 +11,57 @@
         verifyLink,
         } = require("../utils/generateToken")
         
+  registerUser = async (req, res) => { 
+       try {
+        const bigData = req.body;
+        const data = {...bigData}
 
- registerUser = async (req, res) => { 
-  const bigData = req.body;
-  const data = {...bigData}
-
-  try {
-    let email = data.email
-    // console.log(email)
-
-    // const checkEmailExist = await checkUser(email);
-    // if (checkEmailExist === false) {
-    //     console.log(checkEmailExist)
-    //   } else {
-    //     conslol.log("Win WIn")
-    //   }
-
-
-    //Check if the user already exist
-    password =
-    data.password === data.confirm_password
-        ? await generateHash(data.password)
-        : res.status(422).json(
-            response({
-              success: false,
-              message: "Password mismatch, Comfirm your password",
-            })
-          );
-
-
-    // if (checkEmailExist != email)
-    //   return res
-    //     .status(409)
-    //     .json(response({ message: "User already exist", success: false }));
+             const newUser = await register(data);
+             
+             let verificationLink = await generateEmailVerificationLink(data.email);
+          
+             let msg = {
+               to: data.email,
+               subject: "Welcome, Please Verify your Email",
+               templateId: "SIGNUP_TEMPLATE", // Email Confirmation Template
+               dynamicTemplateData: {
+                 name: data.firstName,
+                 action_url: verificationLink,
+               },
+             }
+             console.log(msg) 
+             // await emailService({
+             //   to: email,
+             //   subject: "Welcome, Please Verify your Email",
+             //   templateId: SIGNUP_TEMPLATE, // Email Confirmation Template
+             //   dynamicTemplateData: {
+             //     name: firstName,
+             //     action_url: verificationLink,
+             //   },
+             // });
+        
+             return res.status(201).json(
+              response({
+                success: true,
+                message: "User created successfully, Check your email for confirmation",
+                data: newUser,
+            }))
+            }
+              catch (error) {
+                return res.status(500).json(
+                  response({
+                    success: false,
+                    message: "Something went wrong, please contact an Admin",
+                    data: "user",
+                  })
+                );
+          }}
         
         
 
-    let verificationLink = await generateEmailVerificationLink(email);
 
-    const user = await register(data);
-    
-    console.log(verificationLink, user)
 
-    await emailService({
-      to: email,
-      subject: "Welcome, Please Verify your Email",
-      templateId: SIGNUP_TEMPLATE, // Email Confirmation Template
-      dynamicTemplateData: {
-        name: firstName,
-        action_url: verificationLink,
-      },
-    });
-
-    if (!user) 
-      console.log("Here1111")
-      return res
-        .status(500)
-        .json(response({ success: false, message: "User not created" }));
-
-    return res.status(201).json(
-      response({
-        success: true,
-        message: "User created successfully, Check your email for confirmation",
-        data: user,
-      })
-    );
-  } catch (error) {
-    return res.status(500).json(
-      response({
-        success: false,
-        message: "Something went wrong, please contact an Admin",
-        data: "user",
-      })
-    );
-  }
-}
-
+  
 async function login(req, res) {
   // retrieve the email and password
   const { email, password } = req.body;
@@ -116,28 +89,6 @@ async function login(req, res) {
   );
 }
 
-async function refreshUserToken(req, res) {
-  const { _id } = req.user;
-  //Check if user already exist
-  const user = await userCollection.findById(_id);
-  if (!user) {
-    return res.status(400).json(
-      response({
-        success: true,
-        message: "User not found",
-      })
-    );
-  }
-
-  return res.status(200).json(
-    response({
-      success: true,
-      message: "Refresh token accepted",
-      data: authResponse(user),
-    })
-  );
-}
-
 async function verifyMail(req, res) {
   let verificationLink = req.params.link;
 
@@ -147,7 +98,7 @@ async function verifyMail(req, res) {
       throw new Error("Link expired");
     }
 
-    // res.status(201).redirect("/v1/auth/signin");
+    // res.status(201).redirect("/auth/signin");
     res.status(201).send({
       success: true,
       message:
@@ -169,5 +120,4 @@ module.exports = {
   registerUser,
   verifyMail,
   login,
-  refreshUserToken,
 };

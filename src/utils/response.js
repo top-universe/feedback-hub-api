@@ -40,6 +40,7 @@ const formatMessage = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 const authResponse = (userData) => {
+
   const user = {
     _id: userData._id,
     firstName: userData.firstName,

@@ -1,11 +1,12 @@
-const  jwt = require('jsonwebtoken');
-const { environment } = require('../config/environment');
-require('dotenv');
-const {JWT_SECRET, HOST} = environment;
+const  jwt = require("jsonwebtoken");
+// const { environment } = require("../config/environment");
+require("../config/index") // load config
+
+
 
 const verifyJWTToken = (token) => {
   return new Promise((resolve) => {
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, AppConfig.JWT_SECRET, (err, decoded) => {
       if (!err) {
         
 				resolve(decoded)
@@ -16,17 +17,23 @@ const verifyJWTToken = (token) => {
   });
 };
     // generate email verification link when verify a newly created account
-   const generateEmailVerificationLink = async function (user) {
-    console.log("generateEmailVerificationLink")
-      link = jwt.sign(user, JWT_SECRET, { expiresIn: "1800000"}) //token expires in 30 minutes
-      verificationLink = `${HOST}/v1/auth/verify/${link}`
-      console.log(verificationLink)
-      return verificationLink
-  };
+    const generateEmailVerificationLink = async function (user) {
+      try {
+        const payload = {
+          id: user
+      }
+        const link = jwt.sign(payload, AppConfig.JWT_SECRET, { expiresIn: 1800 }); // token expires in 30 minutes
+        const verificationLink = `${AppConfig.HOST}/v1/auth/verify/${link}`;
+        return verificationLink;
+      } catch (error) {
+        console.error("Error generating email verification link:", error);
+        throw error; // Rethrow the error to handle it elsewhere if needed
+      }
+    };
 
   // verify jwt => returns embeded user object if links is still active
   const verifyLink = async function (link) {
-      let isValid = jwt.verify(link, JWT_SECRET )
+      let isValid = jwt.verify(link, AppConfig.JWT_SECRET )
       if(isValid) return isValid
   };
 

@@ -1,8 +1,7 @@
 
 const { createServer } = require("http");
-const mongoose = require("mongoose");
+require("./src/utils/database")// load database
 
-mongoose.set("strictQuery", true); // to suppress this warning the DeprecationWarning
 const app = require("./index");
 const { environment } = require("./src/config/environment");
 

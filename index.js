@@ -1,6 +1,5 @@
 require('dotenv').config()
-//require('./src/config') // load config
-require('./src/config/index') // load database
+require('./src/config/index') // load config
 const {cors} = require('./src/utils/cors'),
     express = require('express'),
     app = express()
@@ -32,7 +31,6 @@ app.use(express.json())
     .use(express.urlencoded({ extended: false }))
     .use(routeHandler) // mounting modules
     .get('/', (req,res) => res.send('Everything works pretty well 🚀, powered by Top Universe'))
- //   .listen(AppConfig.PORT, () =>  console.log(`App is running on port ${AppConfig.PORT}`)) // launch express app
 
     
 //404 error
