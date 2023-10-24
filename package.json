@@ -23,5 +23,8 @@
     "mongoose": "^7.5.4",
     "uuid": "^9.0.1"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@prisma/client": "^5.5.0"
+  }
 }

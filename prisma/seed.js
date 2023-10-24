@@ -4,26 +4,31 @@ const argon2 = require("argon2");
 
 async function main() {
   try {
-    // Define your sample data
-    const users = [
-      {
+    // user one
+    await prisma.user.create({
+      data: {
         username: "MagicMarv",
         email: "MagicMarv@feedback.com",
-        password: await argon2.hash(12345678),
+        password: {
+          create: {
+            hashed: await argon2.hash("12345678"),
+          },
+        },
       },
-      {
+    });
+
+    // user two
+    await prisma.user.create({
+      data: {
         username: "Zeddic",
         email: "Zeddic@feedback.com",
-        password: await argon2.hash(12345678),
+        password: {
+          create: {
+            hashed: await argon2.hash("12345678"),
+          },
+        },
       },
-    ];
-
-    // Use Prisma to create records
-    for (const userData of users) {
-      await prisma.user.create({
-        data: userData,
-      });
-    }
+    });
 
     console.log("Seed script completed successfully");
   } catch (error) {
