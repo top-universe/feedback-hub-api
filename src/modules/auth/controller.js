@@ -1,3 +1,7 @@
+const { userSchema } = require("../../helpers/dataValidators");
+const { hashPassword } = require("../../helpers/passHandler");
+const { AuthRespository } = require("./repository");
+
 exports.authController = {
   /**
    * This controller function handles user registration
@@ -5,7 +9,35 @@ exports.authController = {
    * @param {Object} - User registration details
    */
   CreateUser: async (req, res) => {
-    res.status(200).json("Hello World!");
+    const userData = req.body;
+
+    try {
+      // validate incomming data
+      const { error, value } = userSchema.validate(userData);
+      if (error) {
+        return Response.error(res, error.details[0].message, 400);
+      }
+
+      // check if email already exist
+      const isExistingUser = await AuthRespository.isUser(value.email);
+      if (isExistingUser) {
+        return Response.error(res, "Email is already in Use", 400);
+      }
+
+      // Hash the password before storing it in the database
+      const hashPass = await hashPassword(value.password);
+
+      // Create a new user record
+      const user = { value, hashPass };
+
+      return Response.success(
+        res,
+        "Registration successfully, proceed to email verification"
+      );
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Registration failed" });
+    }
   },
 
   /**

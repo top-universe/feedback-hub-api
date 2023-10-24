@@ -1,4 +1,5 @@
 require("dotenv").config();
+require("./src/utils/globals");
 const express = require("express");
 const cors = require("cors");
 const authRouter = require("./src/modules/auth/routes");
