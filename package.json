@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mongoose": "^7.5.4",
+    "nodemailer": "^6.9.7",
     "uuid": "^9.0.1"
   },
   "description": "",

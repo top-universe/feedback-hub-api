@@ -1,6 +1,8 @@
 const { userSchema } = require("../../helpers/dataValidators");
 const { hashPassword } = require("../../helpers/passHandler");
 const { AuthRespository } = require("./repository");
+const { EMAIL_VERIFICATION } = require("../../services/EmailService/constants");
+const { sendEmailHandler } = require("../../services/EmailService/mailer");
 
 exports.authController = {
   /**
@@ -36,8 +38,15 @@ exports.authController = {
       const user = await AuthRespository.createUser(userInfo);
 
       // Generate token and link
+      const token = "fghjkl";
+      const link = process.env.FE_URL`/${token}`;
 
       // Send verification email
+      await sendEmailHandler(
+        user.email,
+        "Email Verification",
+        EMAIL_VERIFICATION(link)
+      );
 
       return Response.success(
         res,
