@@ -1,43 +1,31 @@
-require('dotenv').config()
-require('./src/config/index') // load config
-const {cors} = require('./src/utils/cors'),
-    express = require('express'),
-    app = express()
+require("dotenv").config();
+require("./src/utils/globals");
+const express = require("express");
+const cors = require("cors");
+const authRouter = require("./src/modules/auth/routes");
 
-// middleware for expired token
-app.use(async (req, res, next) => {
-    if (req.headers["x-access-token"]) {
-     const accessToken = req.headers["x-access-token"];
-     const { userId, exp } = await jwt.verify(accessToken, AppConfig.JWT_SECRET);
-     // Check if token has expired
-     if (exp < Date.now().valueOf() / 1000) {
-      return res.status(401).json({
-       error: "JWT token has expired, please login to obtain a new one"
-      });
-     }
-     res.locals.loggedInUser = await User.findById(userId);
-     next();
-    } else {
-     next();
-    }
+const app = express();
+
+// middlewares
+app.use(cors());
+
+// Use the express.urlencoded middleware to parse URL-encoded form data
+app.use(express.urlencoded({ extended: true }));
+
+//middleware to enable JSON data parsing.
+app.use(express.json());
+
+// SWAGGER
+app.get("/", (req, res) => {
+  res.send(
+    `<h2 style="text-align:center; padding-top:10px">Welcome to FeedbackHub-API</h2>`
+  );
 });
+// Routes
+app.use("/api/v1/", authRouter);
 
-// importing module routers
-const {routeHandler} = require('./src/routes/index.route')
-
-// initialise modules
-app.use(express.json())
-    .use(cors) // loaded cors
-    .use(express.urlencoded({ extended: false }))
-    .use(routeHandler) // mounting modules
-    .get('/', (req,res) => res.send('Everything works pretty well 🚀, powered by Top Universe'))
-
-    
-//404 error
-app.all("*", (req, res) => {
-    res.status(404).json({
-      message: "Ohh you are lost, path not found.",
-    });
-  });
-
-    module.exports = app;
+// app running .....
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running..on port::${PORT} 🚀`);
+});
