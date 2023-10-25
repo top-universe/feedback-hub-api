@@ -28,7 +28,16 @@ exports.authController = {
       const hashPass = await hashPassword(value.password);
 
       // Create a new user record
-      const user = { value, hashPass };
+      const userInfo = {
+        username: value.username,
+        email: value.email,
+        password: hashPass,
+      };
+      const user = await AuthRespository.createUser(userInfo);
+
+      // Generate token and link
+
+      // Send verification email
 
       return Response.success(
         res,

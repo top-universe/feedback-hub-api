@@ -24,5 +24,28 @@ exports.AuthRespository = {
     }
   },
 
-  async createUser(user) {},
+  /**
+   * Store data in the database.
+   * @param {object} data - The data to be stored in the database.
+   * @returns {Promise} A Promise that resolves when the data is successfully stored.
+   * @throws {Error} If there is an error during database storage.
+   */
+  async createUser(data) {
+    try {
+      // Use Prisma to store the data in the database
+      return await prisma.user.create({
+        data: {
+          username: data.username,
+          email: data.email,
+          password: {
+            create: {
+              hashed: data.password,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw new Error("Error storing data in the database");
+    }
+  },
 };
