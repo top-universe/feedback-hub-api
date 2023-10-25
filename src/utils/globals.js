@@ -1,7 +1,7 @@
 /**
  * Import successFunction and errorFunction and set up global variables
  */
-import { success, error } from "./response"; //Response Object {success, error}
+const { success, error } = require("./response"); //Response Object {success, error}
 
 /**
  * @typedef {Object} - Response Object
