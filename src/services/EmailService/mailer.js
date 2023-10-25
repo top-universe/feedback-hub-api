@@ -33,5 +33,3 @@ exports.sendEmailHandler = async (to, subject, template) => {
     console.error("Error sending email: " + error);
   }
 };
-
-module.export = sendEmailHandler;

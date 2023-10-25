@@ -1,4 +1,4 @@
-exports.EMAIL_VERIFICATION = (Link) => {
+exports.EMAIL_VERIFICATION = async (Link) =>
   `
   <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +10,7 @@ exports.EMAIL_VERIFICATION = (Link) => {
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
+            color:#000;
             margin: 0;
             padding: 0;
         }
@@ -48,4 +49,3 @@ exports.EMAIL_VERIFICATION = (Link) => {
 </html>
 
 `;
-};
