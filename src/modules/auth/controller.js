@@ -1,7 +1,10 @@
 const { userSchema } = require("../../helpers/dataValidators");
 const { hashPassword } = require("../../helpers/passHandler");
 const { AuthRespository } = require("./repository");
-const { EMAIL_VERIFICATION } = require("../../services/EmailService/constants");
+const {
+  EMAIL_VERIFICATION,
+  EMAIL_VERIFICATION_STATUS,
+} = require("../../services/EmailService/constants");
 const { sendEmailHandler } = require("../../services/EmailService/mailer");
 const { generateJWT, verifyJWT } = require("../../helpers/jwtHandler");
 
@@ -75,6 +78,14 @@ exports.authController = {
 
       // update status
       const updatedStatus = await AuthRespository.updateVerifiedStatus(id);
+
+      // Send email to inform user of his status
+      // log(updatedStatus);
+      await sendEmailHandler(
+        updatedStatus.email,
+        "Email Verification Status",
+        await EMAIL_VERIFICATION_STATUS(updatedStatus.username)
+      );
 
       // Response
       if (!updatedStatus) throw Error("Token has expired");
