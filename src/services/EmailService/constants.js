@@ -43,6 +43,8 @@ exports.EMAIL_VERIFICATION = async (Link) =>
         <h1>Email Verification</h1>
         <p>Thank you for signing up! To complete your registration, please click the button below to verify your email address:</p>
         <a class="btn" href="${Link}">Verify Email</a>
+        <p>Or copy and paste this link in your browser 👇🏼</p>
+        <p>${Link}</p>
         <p>If you didn't create an account with us, please disregard this email.</p>
     </div>
 </body>

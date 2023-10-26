@@ -12,18 +12,15 @@ datasource db {
 
 // User Model
 model User {
-  id       String @id @default(uuid())
+  id       String    @id @default(uuid())
   username String
   email    String
+  status   String?   @default("inactive")
   password Password?
 }
 
 model Password {
-  hashed    String?
-  user      User   @relation(fields: [userId], references: [id])
-  userId    String @unique
+  hashed String?
+  user   User    @relation(fields: [userId], references: [id])
+  userId String  @unique
 }
-
-
-
-

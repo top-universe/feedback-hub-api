@@ -9,6 +9,7 @@ async function main() {
       data: {
         username: "MagicMarv",
         email: "MagicMarv@feedback.com",
+        status: "active",
         password: {
           create: {
             hashed: await argon2.hash("12345678"),
@@ -22,6 +23,7 @@ async function main() {
       data: {
         username: "Zeddic",
         email: "Zeddic@feedback.com",
+        status: "active",
         password: {
           create: {
             hashed: await argon2.hash("12345678"),

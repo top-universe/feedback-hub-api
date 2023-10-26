@@ -48,4 +48,20 @@ exports.AuthRespository = {
       throw new Error("Error storing data in the database");
     }
   },
+
+  async updateVerifiedStatus(id) {
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id },
+        data: {
+          status: "active",
+        },
+      });
+
+      return updatedUser;
+    } catch (error) {
+      log(error.message);
+      throw new Error("Error while updating user info");
+    }
+  },
 };

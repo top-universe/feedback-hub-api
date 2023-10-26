@@ -3,7 +3,7 @@ const { hashPassword } = require("../../helpers/passHandler");
 const { AuthRespository } = require("./repository");
 const { EMAIL_VERIFICATION } = require("../../services/EmailService/constants");
 const { sendEmailHandler } = require("../../services/EmailService/mailer");
-const { generateJWT } = require("../../helpers/jwtHandler");
+const { generateJWT, verifyJWT } = require("../../helpers/jwtHandler");
 
 exports.authController = {
   /**
@@ -41,7 +41,7 @@ exports.authController = {
       // Generate token and link
       const token = generateJWT({ id: user.id, username: user.username }, 3600);
 
-      const link = process.env.FE_URL + `/${token}`;
+      const link = process.env.FE_URL + `verify/${token}`;
       // log(link);
 
       // Send verification email
@@ -66,7 +66,25 @@ exports.authController = {
    * @typedef {Function} - Email verification
    * @param {String} - collects token: string as parameter and update status of account
    */
-  VerifyEmail: async (req, res) => {},
+  VerifyEmail: async (req, res) => {
+    const { token } = req.params;
+
+    try {
+      // check if token is valid
+      const { id } = verifyJWT(token);
+
+      // update status
+      const updatedStatus = await AuthRespository.updateVerifiedStatus(id);
+
+      // Response
+      if (!updatedStatus) throw Error("Token has expired");
+
+      return Response.success(res, "Account verified successfully!");
+    } catch (error) {
+      log(error);
+      return Response.error(res, "Error verifying user", 500);
+    }
+  },
 
   /**
    * This controller function handles user sign-in
