@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { verifyPassword } = require("../../helpers/passHandler");
 const prisma = new PrismaClient();
 
 exports.AuthRespository = {
@@ -20,7 +21,7 @@ exports.AuthRespository = {
       });
     } catch (error) {
       log(error.message);
-      throw new Error("Internal Server Error");
+      throw "Internal Server Error";
     }
   },
 
@@ -37,15 +38,62 @@ exports.AuthRespository = {
         data: {
           username: data.username,
           email: data.email,
-          password: {
-            create: {
-              hashed: data.password,
-            },
-          },
+          pass: data.password,
         },
       });
     } catch (error) {
-      throw new Error("Error storing data in the database");
+      throw "Error storing data in the database";
+    }
+  },
+
+  /**
+   * Update the verification status of a user in the database.
+   *
+   * @param {string} id - The unique identifier of the user to update.
+   * @returns {Promise<User>} A Promise that resolves to the updated user object.
+   * @throws {Error} Throws an error if there's an issue updating the user.
+   */
+  async updateVerifiedStatus(id) {
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id },
+        data: {
+          status: "active",
+        },
+      });
+
+      return updatedUser;
+    } catch (error) {
+      log(error.message);
+      throw "Error while updating user info";
+    }
+  },
+
+  /**
+   * Authenticate a user by email and password.
+   *
+   * @param {string} email - The user's email for authentication.
+   * @param {string} password - The user's password for authentication.
+   * @returns {Promise<User>} A Promise that resolves to the authenticated user if successful.
+   * @throws {string} Throws a string message for authentication errors (e.g., "Incorrect password" or "User not found!").
+   */
+  async authenticateUser(email, password) {
+    try {
+      const user = await prisma.user.findFirst({ where: { email } });
+
+      if (!user) {
+        throw new Error("Invalid credentials");
+      }
+      // Compare password
+      const matchPass = await verifyPassword(user.pass, password);
+
+      if (matchPass) {
+        return user;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw new Error(error.message);
     }
   },
 };
