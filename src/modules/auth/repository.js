@@ -96,4 +96,20 @@ exports.AuthRespository = {
       throw new Error(error.message);
     }
   },
+
+  async updatePassword(id, newPass) {
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id },
+        data: {
+          pass: newPass,
+        },
+      });
+
+      return updatedUser;
+    } catch (error) {
+      log(error.message);
+      throw "Error while updating user info";
+    }
+  },
 };

@@ -28,6 +28,7 @@ function verifyJWT(token) {
   try {
     return jwt.verify(token, secret);
   } catch (error) {
+    log(error.message);
     // If the token is invalid, jwt.verify will throw an error, and we catch it here.
     throw new Error("Token verification failed.");
   }

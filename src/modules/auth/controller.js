@@ -5,6 +5,7 @@ const {
   EMAIL_VERIFICATION,
   EMAIL_VERIFICATION_STATUS,
   PASSWORD_RESET,
+  PASSWORD_RESET_SUCCESS,
 } = require("../../services/EmailService/constants");
 const { sendEmailHandler } = require("../../services/EmailService/mailer");
 const { generateJWT, verifyJWT } = require("../../helpers/jwtHandler");
@@ -155,7 +156,7 @@ exports.authController = {
       }
 
       // if user exits - generate token and link to send as email
-      const token = generateJWT({ id: user.id, username: user.username }, 3600);
+      const token = generateJWT({ id: user.id, email: user.email }, 3600);
       const link = `${process.env.FE_URL}/password-reset/${token}`;
 
       await sendEmailHandler(
@@ -164,7 +165,10 @@ exports.authController = {
         await PASSWORD_RESET(link)
       );
 
-      return Response.success(res, "Password Reset sent to your email.");
+      return Response.success(
+        res,
+        "Check your email to complete your password reset."
+      );
     } catch (error) {
       return Response.error(res, error.message, 401);
     }
@@ -175,5 +179,35 @@ exports.authController = {
    * @typedef {Function} - handles password-reset
    * @param {Objest} - new password
    */
-  PasswordReset: async (req, res) => {},
+  PasswordReset: async (req, res) => {
+    try {
+      const { token } = req.params;
+      const { newPassword, confirmPassword } = req.body;
+
+      if (newPassword !== confirmPassword) {
+        return Response.error(res, "Passwords doesn't match!", 400);
+      }
+
+      // Validate the JWT token
+      const { id } = await verifyJWT(token);
+
+      // Hashpassword
+      const newPass = await hashPassword(newPassword);
+
+      // Update User password
+      const updatedUser = await AuthRespository.updatePassword(id, newPass);
+      log(updatedUser.username);
+
+      await sendEmailHandler(
+        updatedUser.email,
+        "Password Reset Successful",
+        await PASSWORD_RESET_SUCCESS(updatedUser.username)
+      );
+      log(updatedUser.username);
+
+      return Response.success(res, "Password successfully changed");
+    } catch (error) {
+      return Response.error(res, error.message, 500);
+    }
+  },
 };
