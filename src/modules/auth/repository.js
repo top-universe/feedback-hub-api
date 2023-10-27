@@ -37,11 +37,7 @@ exports.AuthRespository = {
         data: {
           username: data.username,
           email: data.email,
-          password: {
-            create: {
-              hashed: data.password,
-            },
-          },
+          pass: data.password,
         },
       });
     } catch (error) {
@@ -49,6 +45,13 @@ exports.AuthRespository = {
     }
   },
 
+  /**
+   * Update the verification status of a user in the database.
+   *
+   * @param {string} id - The unique identifier of the user to update.
+   * @returns {Promise<User>} A Promise that resolves to the updated user object.
+   * @throws {Error} Throws an error if there's an issue updating the user.
+   */
   async updateVerifiedStatus(id) {
     try {
       const updatedUser = await prisma.user.update({

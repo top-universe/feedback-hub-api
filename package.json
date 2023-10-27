@@ -27,6 +27,6 @@
   },
   "description": "",
   "devDependencies": {
-    "@prisma/client": "^5.5.0"
+    "@prisma/client": "^5.5.2"
   }
 }
