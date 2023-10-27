@@ -8,7 +8,7 @@ authRouter.post("/register", authController.CreateUser);
 authRouter.put("/verify/:token", authController.VerifyEmail);
 
 // This route handles user sign in
-authRouter.post("/sign-in", authController.SignIn);
+authRouter.post("/signin", authController.SignIn);
 
 // This route initiate user password-reset
 authRouter.post("/password-reset", authController.IntiatePasswordReset);

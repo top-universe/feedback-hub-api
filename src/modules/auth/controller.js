@@ -102,14 +102,50 @@ exports.authController = {
    * @typedef {Function} - User sign function
    * @param {Object} - User sign in details
    */
-  SignIn: async (req, res) => {},
+
+  SignIn: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // Authenticate the user based on email and password
+      const user = await AuthRespository.authenticateUser(email, password);
+
+      if (!user) {
+        return Response.error(
+          res,
+          "Authentication failed. Incorrect credentials.",
+          401
+        );
+      }
+
+      // If authentication succeeds, issue JWT tokens
+      const accessToken = generateJWT(
+        { id: user.id, username: user.username },
+        3600
+      );
+
+      // Return the access token to the client
+      return Response.success(
+        res,
+        "Login successful",
+        {
+          accessToken,
+        },
+        200
+      );
+    } catch (error) {
+      return Response.error(res, error.message, 401);
+    }
+  },
 
   /**
    *This controller function collects user email and a password reset link
    * @typedef {Function} - initiate password-reset
    * @param {String} - user email
    */
-  IntiatePasswordReset: async (req, res) => {},
+  IntiatePasswordReset: async (req, res) => {
+    const { email } = req.body;
+  },
 
   /**
    * This controller function handles password-reset operations

@@ -9,13 +9,13 @@ async function main() {
         username: "MagicMarv",
         email: "MagicMarv@feedback.com",
         status: "active",
-        pass: "$argon2id$v=19$m=65536,t=3,p=4$L/7ey1k6PnzKAspbopwsLA$qnA6hFgR7VG9Q7nJ8G4IF/vygKJrwgGjL/bW6FKzzxM",
+        pass: await argon2.hash("12345"),
       },
       {
         username: "Zeddic",
         email: "Zeddic@feedback.com",
         status: "active",
-        pass: "$argon2id$v=19$m=65536,t=3,p=4$L/7ey1k6PnzKAspbopwsLA$qnA6hFgR7VG9Q7nJ8G4IF/vygKJrwgGjL/bW6FKzzxM",
+        pass: await argon2.hash("12345"),
       },
     ];
 
