@@ -4,6 +4,7 @@ const { AuthRespository } = require("./repository");
 const {
   EMAIL_VERIFICATION,
   EMAIL_VERIFICATION_STATUS,
+  PASSWORD_RESET,
 } = require("../../services/EmailService/constants");
 const { sendEmailHandler } = require("../../services/EmailService/mailer");
 const { generateJWT, verifyJWT } = require("../../helpers/jwtHandler");
@@ -144,7 +145,29 @@ exports.authController = {
    * @param {String} - user email
    */
   IntiatePasswordReset: async (req, res) => {
-    const { email } = req.body;
+    try {
+      const { email } = req.body;
+
+      // Verify if user exists
+      const user = await AuthRespository.isUser(email);
+      if (!user) {
+        return Response.error(res, "User not found", 404);
+      }
+
+      // if user exits - generate token and link to send as email
+      const token = generateJWT({ id: user.id, username: user.username }, 3600);
+      const link = `${process.env.FE_URL}/password-reset/${token}`;
+
+      await sendEmailHandler(
+        user.email,
+        "Password Reset",
+        await PASSWORD_RESET(link)
+      );
+
+      return Response.success(res, "Password Reset sent to your email.");
+    } catch (error) {
+      return Response.error(res, error.message, 401);
+    }
   },
 
   /**
