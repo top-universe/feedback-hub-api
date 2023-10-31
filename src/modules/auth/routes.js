@@ -5,7 +5,7 @@ const { authController } = require("./controller");
 authRouter.post("/register", authController.CreateUser);
 
 // This route handles email verification
-authRouter.put("/verify/:token", authController.VerifyEmail);
+authRouter.get("/verify/:token", authController.VerifyEmail);
 
 // This route handles user sign in
 authRouter.post("/signin", authController.SignIn);
