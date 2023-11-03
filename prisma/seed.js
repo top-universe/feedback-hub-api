@@ -4,33 +4,25 @@ const argon2 = require("argon2");
 
 async function main() {
   try {
-    // user one
-    await prisma.user.create({
-      data: {
+    const userLists = [
+      {
         username: "MagicMarv",
         email: "MagicMarv@feedback.com",
-        password: {
-          create: {
-            hashed: await argon2.hash("12345678"),
-          },
-        },
+        status: "active",
+        pass: await argon2.hash("12345"),
       },
-    });
-
-    // user two
-    await prisma.user.create({
-      data: {
+      {
         username: "Zeddic",
         email: "Zeddic@feedback.com",
-        password: {
-          create: {
-            hashed: await argon2.hash("12345678"),
-          },
-        },
+        status: "active",
+        pass: await argon2.hash("12345"),
       },
-    });
+    ];
 
-    console.log("Seed script completed successfully");
+    for (let user of userLists) {
+      let createdUser = await prisma.user.create({ data: user });
+      console.log(`Created User with id: ${createdUser.id}`);
+    }
   } catch (error) {
     console.error("Error seeding the database:", error);
   } finally {

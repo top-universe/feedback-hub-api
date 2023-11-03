@@ -26,9 +26,9 @@ function generateJWT(payload, expiresIn) {
  */
 function verifyJWT(token) {
   try {
-    const decoded = jwt.verify(token, secret);
-    return decoded;
+    return jwt.verify(token, secret);
   } catch (error) {
+    log(error.message);
     // If the token is invalid, jwt.verify will throw an error, and we catch it here.
     throw new Error("Token verification failed.");
   }
