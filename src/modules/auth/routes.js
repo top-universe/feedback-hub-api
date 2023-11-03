@@ -10,10 +10,16 @@ authRouter.get("/verify/:token", authController.VerifyEmail);
 // This route handles user sign in
 authRouter.post("/signin", authController.SignIn);
 
-// This route initiate user password-reset
-authRouter.post("/password-reset", authController.IntiatePasswordReset);
+// This route handles user password-reset initiatiation - by collecting the user email
+authRouter.post("/password-reset/request", authController.IntiatePasswordReset);
 
-// This route handles user password-reset
-authRouter.put("/password-reset/:token", authController.PasswordReset);
+// This route handles user password-reset token verification and renders/redirect user to password reset page
+authRouter.get(
+  "/password-reset/:token",
+  authController.VerifyPasswordResetToken
+);
+
+//This route handles user password reset
+authRouter.post("/password-reset", authController.PasswordReset);
 
 module.exports = authRouter;

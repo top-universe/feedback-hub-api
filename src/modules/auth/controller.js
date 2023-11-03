@@ -165,10 +165,34 @@ exports.authController = {
         await PASSWORD_RESET(link)
       );
 
+      // save token in the database
+
       return Response.success(
         res,
         "Check your email to complete your password reset."
       );
+    } catch (error) {
+      return Response.error(res, error.message, 401);
+    }
+  },
+
+  /**
+   * Verify a password reset token and redirect to the password reset page.
+   *
+   * @param {Object} req - The request object.
+   * @param {Object} res - The response object.
+   * @throws {Error} If the token is invalid.
+   */
+  VerifyPasswordResetToken: async (req, res) => {
+    try {
+      const { token } = req.params;
+      // Validate the token and check if it's still valid
+      const { id } = await verifyJWT(token);
+      if (!id) {
+        throw new Error("Invalid Token");
+      }
+      const frontendResetPageUrl = `${process.env.FE_URL}/reset-password?token=${token}`;
+      return res.redirect(frontendResetPageUrl);
     } catch (error) {
       return Response.error(res, error.message, 401);
     }
@@ -181,8 +205,7 @@ exports.authController = {
    */
   PasswordReset: async (req, res) => {
     try {
-      const { token } = req.params;
-      const { newPassword, confirmPassword } = req.body;
+      const { token, newPassword, confirmPassword } = req.body;
 
       if (newPassword !== confirmPassword) {
         return Response.error(res, "Passwords doesn't match!", 400);
@@ -191,19 +214,27 @@ exports.authController = {
       // Validate the JWT token
       const { id } = await verifyJWT(token);
 
+      // check if user exists
+      const isUser = await AuthRespository.isUser(id);
+      if (!isUser) {
+        throw new Error(`Invalid User!`);
+      }
+
       // Hashpassword
-      const newPass = await hashPassword(newPassword);
+      const pass = await hashPassword(newPassword);
 
-      // Update User password
-      const updatedUser = await AuthRespository.updatePassword(id, newPass);
-      log(updatedUser.username);
+      // Update User password and set the token to null
+      const updatedUser = await AuthRespository.updateUser(id, {
+        pass,
+        token: null,
+      });
 
+      // Send password reset success email
       await sendEmailHandler(
         updatedUser.email,
         "Password Reset Successful",
         await PASSWORD_RESET_SUCCESS(updatedUser.username)
       );
-      log(updatedUser.username);
 
       return Response.success(res, "Password successfully changed");
     } catch (error) {

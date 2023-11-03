@@ -16,7 +16,11 @@ exports.AuthRespository = {
       // find a user where either the email or username matches the provided identifier
       return await prisma.user.findFirst({
         where: {
-          OR: [{ email: identifier }, { username: identifier }],
+          OR: [
+            { email: identifier },
+            { username: identifier },
+            { id: identifier },
+          ],
         },
       });
     } catch (error) {
@@ -97,13 +101,11 @@ exports.AuthRespository = {
     }
   },
 
-  async updatePassword(id, newPass) {
+  async updateUser(id, input) {
     try {
       const updatedUser = await prisma.user.update({
         where: { id },
-        data: {
-          pass: newPass,
-        },
+        data: input,
       });
 
       return updatedUser;
